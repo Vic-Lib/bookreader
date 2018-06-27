@@ -27,7 +27,7 @@ function HookBookreaderViewRenderbeforerecorddownload()
 
         // This applies only to resources that have multi page previews
         $preview_url = getPreviewURL($resource, -1, $i);
-
+        $preview_url = "http://128.100.124.214/leslie/resourcespace/plugins/bookreader/jpgs/pg-002";
         if(false === $preview_url)
             {
             continue;
@@ -41,5 +41,27 @@ function HookBookreaderViewRenderbeforerecorddownload()
         <?php
         }
     }
+
+function HookBookreaderViewReplacepreviewlink(){
+	?>
+	<div id="previewWrapper">
+        <a id="previewlink"
+           class="newClass"
+           href=""
+           title=""
+           style="position:relative;"
+           onclick="doSomethingFancy()">
+	<?php
+
+	return true;
+}
+
+
+function HookBookreaderViewRenderbeforeresourcedetails(){
+	?>
+	<a href="../plugins/bookreader/BookReader-source/BookReaderDemo/demo-advanced.html">Link to the Moon (test)</a>
+
+	<?php
+}
 
 ?>
