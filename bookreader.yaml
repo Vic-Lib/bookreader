@@ -3,4 +3,4 @@ author  : Leslie Lau
 version : 1.0
 desc    : Allows use of IA Bookreader with search capability.
 config_url: /plugins/bookreader/pages/setup.php
-category: Search
+category: Content Sharing
