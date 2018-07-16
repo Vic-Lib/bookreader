@@ -1,24 +1,41 @@
 <?php
 
-function HookBookreaderViewRenderbeforerecorddownload()
-	{
+include dirname(__FILE__) . "/../include/utility.php";
+
+function HookBookreaderViewRenderbeforerecorddownload(){
+  global $baseurl;
     ?>
-    <script>
+      <script>
       var overlay_exists = document.getElementById("br-overlay");
       if (!overlay_exists){
-        jQuery("body").append('<div id="br-overlay" style="background-color:rgba(0,0,0); opacity:0.8; width:100%; height:100%; display:none;"></div>');
+        jQuery("body").append('<div id="br-overlay" style="background-color:rgb(0,0,0); opacity:0.9; width:100%; height:100%; position:fixed; display:none; "></div>');
+        jQuery("body").append('<div id="br-content" style="width:100%; height:100%; position:fixed; display:none;"><iframe id="bookreader-wrapper" src="../plugins/bookreader/include/bookreader_init.php" style="width:80%; height:80%; top:50px; position:relative;"></iframe></div>');
       }
-    </script>
+      </script>
     <?php
   }
 
 function HookBookreaderViewReplacepreviewlink() {
-  global $baseurl;
+  global $baseurl, $resource;
+
 	?>
 
   <div id="previewWrapper">
-    <a id="previewLink" onclick="showDemo()">
-    <script src="../plugins/bookreader/BookReader-source/test.js" type="text/javascript"></script>
+    <a id="previewLink" onclick="displayBR()">
+      <script>
+        function displayBR(){
+          ModalClose();
+          jQuery("#br-overlay").css("display", "block");
+          jQuery("#br-content").css("display", "block");
+          jQuery("#br-content").attr("onclick", "closeBox()"); 
+        }
+
+        function closeBox(){
+            jQuery("#br-overlay").css("display", "none");
+            jQuery("#br-content").css("display", "none");
+        }
+
+      </script>
   </div>
   
 	<?php
