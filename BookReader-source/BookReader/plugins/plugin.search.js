@@ -3,7 +3,7 @@
  */
 
 jQuery.extend(true, BookReader.defaultOptions, {
-    server: 'ia600609.us.archive.org',
+    server: '128.100.124.214',
     bookId: '',
     subPrefix: '',
     bookPath: '',
@@ -149,7 +149,8 @@ BookReader.prototype.search = function(term, options) {
     term = '"' + term + '"';
 
     // Remove the port and userdir
-    var url = 'https://' + this.server.replace(/:.+/, '') + this.searchInsideUrl + '?';
+    //var url = 'https://' + this.server.replace(/:.+/, '') + this.searchInsideUrl + '?';
+    var url = 'http://' + this.server.replace(/:.+/, '') + this.searchInsideUrl + '?';
 
     // Remove subPrefix from end of path
     var path = this.bookPath;
