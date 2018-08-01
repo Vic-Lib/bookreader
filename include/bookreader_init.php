@@ -1,35 +1,89 @@
-<?php
-
-?>
-
+<!DOCTYPE html>
 <html>
 <head>
-	<title>bookreader demo</title>
+    <title>bookreader demo</title>
 
-	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-	<meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="apple-mobile-web-app-capable" content="yes">
 
-	<link rel="stylesheet" href="../BookReader-source/BookReader/BookReader.css"/>
+    <!-- JS dependencies -->
+    <script src="../BookReader-source/BookReader/jquery-1.10.1.js"></script>
+    <script src="../BookReader-source/BookReader/jquery-ui-1.12.0.min.js"></script>
+    <script src="../BookReader-source/BookReader/jquery.browser.min.js"></script>
+    <script src="../BookReader-source/BookReader/dragscrollable-br.js"></script>
+    <script src="../BookReader-source/BookReader/jquery.colorbox-min.js"></script>
+    <script src="../BookReader-source/BookReader/jquery.bt.min.js"></script>
 
-	<!-- Include Embed css -->
-	<link rel="stylesheet" href="../BookReader-source/BookReader/BookReaderEmbed.css"/>
+    <!-- BookReader and plugins -->
+    <link rel="stylesheet" href="../BookReader-source/BookReader/BookReader.css"/>
+    <script src="../BookReader-source/BookReader/BookReader.js"></script>
+    <script type="text/javascript" src="../BookReader-source/BookReader/plugins/plugin.url.js"></script>
+    <script src="../BookReader-source/BookReader/plugins/plugin.search.js"></script>    
 
-	<script src="../BookReader-source/BookReader/jquery-1.10.1.js"></script>
-	<script src="../BookReader-source/BookReader/jquery-ui-1.12.0.min.js"></script>
-	<script src="../BookReader-source/BookReader/jquery.browser.min.js"></script>
-	<script src="../BookReader-source/BookReader/dragscrollable-br.js"></script>
-	<script src="../BookReader-source/BookReader/jquery.colorbox-min.js"></script>
-	<script src="../BookReader-source/BookReader/jquery.bt.min.js"></script>
-
-	<script src="../BookReader-source/BookReader/BookReader.js"></script>
-
-	<!-- Plugins -->
-	<script src="../BookReader-source/BookReader/plugins/plugin.iframe.js"></script>
+    <!-- Custom CSS overrides -->
+    <link rel="stylesheet" href="../BookReader-source/BookReaderDemo/BookReaderDemo.css"/>
 
 	<style>
-		html, body, #BookReader { width: 100%; height:100%; margin:0; padding: 0; }
+		html, body { width: 100%; height:100%; margin:0; padding: 0; }
+        #BookReader { width: 100%; height:100%; }
 	</style>
+
+
+    <?php
+
+    // Set the private API key for the user (from the user account page) and the user we're accessing the system as.
+    $private_key="";
+    $user="";
+    $url = "";
+    $rid = $_POST['rid'];
+
+    // Run a query to get the number of pages in the pdf
+    $query="user=" . $user . "&function=get_page_count&param1=" . $rid;
+    $sign=hash("sha256", $private_key . $query);
+    $num_pages = file_get_contents($url . "api/?" . $query . "&sign=" . $sign);
+    $page_count = str_replace('"', '', $num_pages);
+    
+    // Run a query to get the path to the pdf
+    $query="user=" . $user . "&function=get_resource_path&param1=" . $rid . "&param2=&param3=&param4=&param5=pdf&param6=";
+    $sign=hash("sha256", $private_key . $query);
+    $path_to_pdf = file_get_contents($url . "api/?" . $query . "&sign=" . $sign);
+    $path_to_pdf = str_replace('\\', '', $path_to_pdf);
+
+    // Run a query to get the individual pdf pages
+    $image_sizes = array();
+    $url_list = array();
+
+    for ($i = 1; $i < $page_count + 1; $i++){
+        $query="user=" . $user . "&function=get_resource_path&param1=" . $rid . "&param2=&param3=scr&param4=&param5=&param6=" . $i;
+        $sign=hash("sha256",$private_key . $query);
+        $uri = file_get_contents($url . "api/?" . $query . "&sign=" . $sign);
+        
+        $uri = str_replace('"', '', $uri);
+        $uri = str_replace('\\', '', $uri);
+
+        list($width, $height) = getimagesize($uri);
+
+        array_push($image_sizes, array($width, $height));
+        array_push($url_list, $uri);
+    }
+
+    // Pass variables along to javascript
+    // Arrays must be encoded first
+    $image_sizes = json_encode($image_sizes);
+    $url_list = json_encode($url_list);
+
+    echo '<script type="text/javascript">';
+    echo "var rid = " . $rid . ";\n";
+    echo "var num_pages = " . $page_count . ";\n";
+    echo "var page_sizes = " . $image_sizes . ";\n";
+    echo "var path_to_pdf = " . $path_to_pdf . ";\n";
+    echo "var url_list = " . $url_list . ";\n";
+    echo "</script>";
+
+    ?>
+
 </head>
+
 <body style="background-color: #939598;">
 
 	<div id="BookReader">
@@ -42,71 +96,7 @@
 	</noscript>
 	</div>
 
+    <script src="../script/bookreader_script.js" type="text/javascript"></script>
+
 </body>
 </html>
-
-<script>
-    //
-    // This file shows the minimum you need to provide to BookReader to display a book
-    //
-    // Copyright(c)2008-2009 Internet Archive. Software license AGPL version 3.
-
-    // Create the BookReader object
-    var options = {
-        data: [
-        <?php
-
-        $private_key="";
-        $user="";
-        $url = 'http://128.100.124.214/leslie/resourcespace/';
-
-        $query="user=" . $user . "&function=get_page_count&param1=6558";
-        $sign=hash("",$private_key . $query);
-        $num_pages = file_get_contents($url . "api/?" . $query . "&sign=" . $sign);
-        $page_count = str_replace('"', '', $num_pages);
-
-        $output = "";
-        $w = 800;
-        $h = 1200;
-
-        for ($i = 1; $i < $page_count + 1; $i++){
-            $query="user=" . $user . "&function=get_resource_path&param1=6558&param2=&param3=scr&param4=&param5=&param6=" . $i;
-            $sign=hash("sha256",$private_key . $query);
-            $uri = file_get_contents($url . "api/?" . $query . "&sign=" . $sign);
-
-            $output .= "[{width:" . $w . ", height:" . $h .", uri:" . $uri . "}],";
-        }
-        echo $output;
-
-        ?>
-        ],
-
-        // Book title and the URL used for the book title link
-        bookTitle: 'BookReader Embedded',
-        bookUrl: 'https://archive.org/details/BookReader',
-        bookUrlText: 'Back to Archive.org',
-        bookUrlTitle: 'Back to Archive.org',
-
-        // Override the path used to find UI images
-        imagesBaseURL: '../BookReader-source/BookReader/images/',
-        // Note previously the UI param was used for mobile, but it's going to be responsive
-        // embed === iframe
-
-        ui: 'embed', // embed, full (responsive)
-
-        el: '#BookReader',
-
-        //searchInsideUrl: "../exec_testApi.php",
-
-    };
-
-    var br = new BookReader(options);
-
-    // Let's go!
-    br.init();
-
-</script>
-
-<?php
-    
-?>
