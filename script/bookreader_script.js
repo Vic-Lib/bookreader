@@ -54,12 +54,6 @@ var options = {
     getPageNum: function(index) {
         return index+1;
     },
-    
-    // Book title and the URL used for the book title link
-    bookTitle: 'BookReader',
-    bookUrl: '/BookReaderDemo/index.html',
-    bookUrlText: 'Back to Archive.org',
-    bookUrlTitle: 'Back to Archive.org',
 
     // Override the path used to find UI images
     imagesBaseURL: '../BookReader-source/BookReader/images/',
