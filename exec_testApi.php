@@ -115,7 +115,6 @@ foreach ($text_lines as $line)
 		$tBound = $bounds[1] * $ratio_h;
 		$rBound = $bounds[2] * $ratio_w;
 		$lBound = $bounds[3] * $ratio_w;
-
 		}
 	elseif ($label == "term_bounds")
 		{
