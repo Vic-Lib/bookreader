@@ -6,11 +6,11 @@
  * Echo out the resulting json file.
  */
 
-$callback 	= $_GET['callback'];
-$item_id 	= $_GET['item_id'];
-$path 		= $_GET['path'];
-$doc 		= $_GET['doc'];
-$q 			= $_GET['q'];
+$callback = $_GET['callback'];
+$item_id  = $_GET['item_id'];
+$path     = $_GET['path'];
+$doc      = $_GET['doc'];
+$q        = $_GET['q'];
 
 if (empty($item_id))
 	{
@@ -24,36 +24,36 @@ if (empty($path))
 else 
 	{
 	// The relative path to your resourcespace filestore directory
-	$pos 			= strpos($path, "filestore");
-	$relative_path  = "../../" . substr($path, $pos);
-	$relative_path  = escapeshellarg($relative_path);
+	$pos           = strpos($path, "filestore");
+	$relative_path = "../../" . substr($path, $pos);
+	$relative_path = escapeshellarg($relative_path);
 	}
 
 $item_id = escapeshellarg($item_id);
-$path 	 = escapeshellarg($path);
-$doc 	 = escapeshellarg($doc);
-$q 		 = escapeshellarg(str_replace('"', '', $q));
-$style 	 = "abbyy";
+$path    = escapeshellarg($path);
+$doc     = escapeshellarg($doc);
+$q       = escapeshellarg(str_replace('"', '', $q));
+$style   = "abbyy";
 
-$cmd 	= "java -jar testApiNew.jar " . $item_id . " " . $relative_path . " " . $q . " '" . $callback . "' '" . $style . "' ";
+$cmd    = "java -jar testApiNew.jar " . $item_id . " " . $relative_path . " " . $q . " '" . $callback . "' '" . $style . "' ";
 $output = shell_exec($cmd);
 
 
 header('Content-Type: application/json');
 
-$lines 		  = explode("\n", $output);
+$lines        = explode("\n", $output);
 $header_lines = array_slice($lines, 0, 5);
 $text_lines   = array_slice($lines, 5);
 
-$cb 	  = substr($header_lines[0], strpos($header_lines[0], ":") + 1);
-$ia 	  = substr($header_lines[1], strpos($header_lines[1], ":") + 1);
-$query 	  = substr($header_lines[2], strpos($header_lines[2], ":") + 1);
+$cb       = substr($header_lines[0], strpos($header_lines[0], ":") + 1);
+$ia       = substr($header_lines[1], strpos($header_lines[1], ":") + 1);
+$query    = substr($header_lines[2], strpos($header_lines[2], ":") + 1);
 $numPages = substr($header_lines[3], strpos($header_lines[3], ":") + 1);
 
 // Set the private API key for the user (from the user account page) and the user we're accessing the system as.
 $private_key = "";
-$user 		 = "";
-$url 		 = "";
+$user        = "";
+$url         = "";
 
 /***
  * Start of output from exec_testApi.php
@@ -86,15 +86,15 @@ foreach ($text_lines as $line)
 	elseif ($label == "page_size")
 		{
 		$dimensions = explode(",", $content);
-		$ratio_w 	= 1.0;
-		$ratio_h  	= 1.0;
-		$pgwidth  	= $dimensions[0];
-		$pgheight 	= $dimensions[1];
-		$p6 	  	= $pagenum + 1;
+		$ratio_w    = 1.0;
+		$ratio_h    = 1.0;
+		$pgwidth    = $dimensions[0];
+		$pgheight   = $dimensions[1];
+		$p6         = $pagenum + 1;
 		
 		$query = "user=" . $user . "&function=get_resource_path&param1=" . trim($item_id, '"\'') . "&param2=&param3=scr&param4=&param5=&param6=" . $p6;
-        $sign  = hash("sha256",$private_key . $query);
-        $uri   = file_get_contents($url . "api/?" . $query . "&sign=" . $sign);
+		$sign  = hash("sha256",$private_key . $query);
+		$uri   = file_get_contents($url . "api/?" . $query . "&sign=" . $sign);
 
         if ($uri != "")
         	{
