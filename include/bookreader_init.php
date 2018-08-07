@@ -35,6 +35,10 @@
     $private_key="";
     $user="";
     $url = "";
+    
+    if (!isset($_POST['rid'])){
+        return true;
+    }
     $rid = $_POST['rid'];
 
     // Run a query to get the number of pages in the pdf
