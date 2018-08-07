@@ -31,50 +31,50 @@
 
     <?php
 
-    // Set the private API key for the user (from the user account page) and the user we're accessing the system as.
-    $private_key="";
-    $user="";
-    $url = "";
-    
-    if (!isset($_POST['rid'])){
+    if (!isset($_POST['rid']))
+        {
         return true;
-    }
+        }
     $rid = $_POST['rid'];
 
+    // Set the private API key for the user (from the user account page) and the user we're accessing the system as.
+    $private_key = "";
+    $user        = "";
+    $url         = "";
+
     // Run a query to get the number of pages in the pdf
-    $query="user=" . $user . "&function=get_page_count&param1=" . $rid;
-    $sign=hash("sha256", $private_key . $query);
-    $num_pages = file_get_contents($url . "api/?" . $query . "&sign=" . $sign);
+    $query      = "user=" . $user . "&function=get_page_count&param1=" . $rid;
+    $sign       = hash("sha256", $private_key . $query);
+    $num_pages  = file_get_contents($url . "api/?" . $query . "&sign=" . $sign);
     $page_count = str_replace('"', '', $num_pages);
     
     // Run a query to get the path to the pdf
-    $query="user=" . $user . "&function=get_resource_path&param1=" . $rid . "&param2=&param3=&param4=&param5=pdf&param6=";
-    $sign=hash("sha256", $private_key . $query);
+    $query       = "user=" . $user . "&function=get_resource_path&param1=" . $rid . "&param2=&param3=&param4=&param5=pdf&param6=";
+    $sign        = hash("sha256", $private_key . $query);
     $path_to_pdf = file_get_contents($url . "api/?" . $query . "&sign=" . $sign);
     $path_to_pdf = str_replace('\\', '', $path_to_pdf);
 
-    // Run a query to get the individual pdf pages
-    $image_sizes = array();
-    $url_list = array();
 
-    for ($i = 1; $i < $page_count + 1; $i++){
-        $query="user=" . $user . "&function=get_resource_path&param1=" . $rid . "&param2=&param3=scr&param4=&param5=&param6=" . $i;
-        $sign=hash("sha256",$private_key . $query);
-        $uri = file_get_contents($url . "api/?" . $query . "&sign=" . $sign);
-        
-        $uri = str_replace('"', '', $uri);
-        $uri = str_replace('\\', '', $uri);
+    $image_sizes = array();
+    $url_list    = array();
+    // Run queries to get the individual pdf pages
+    for ($i = 1; $i < $page_count + 1; $i++)
+        {
+        $query  = "user=" . $user . "&function=get_resource_path&param1=" . $rid . "&param2=&param3=scr&param4=&param5=&param6=" . $i;
+        $sign   = hash("sha256",$private_key . $query);
+        $uri    = file_get_contents($url . "api/?" . $query . "&sign=" . $sign);
+        $uri    = str_replace('"', '', $uri);
+        $uri    = str_replace('\\', '', $uri);
 
         list($width, $height) = getimagesize($uri);
-
         array_push($image_sizes, array($width, $height));
         array_push($url_list, $uri);
-    }
+        }
 
     // Pass variables along to javascript
     // Arrays must be encoded first
     $image_sizes = json_encode($image_sizes);
-    $url_list = json_encode($url_list);
+    $url_list    = json_encode($url_list);
 
     echo '<script type="text/javascript">';
     echo "var rid = " . $rid . ";\n";
