@@ -59,7 +59,13 @@ var options = {
     imagesBaseURL: '../BookReader-source/BookReader/images/',
     // Note previously the UI param was used for mobile, but it's going to be responsive
     // embed === iframe
+    metadata: [
+        {label: 'Resource ID', value: rid},
+        {label: 'Title', value: title},
+    ],
 
+    showLogo: false,
+    
     bookId: rid,
     bookPath: path_to_pdf,
     ui: 'full', // embed, full (responsive)

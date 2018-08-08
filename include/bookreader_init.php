@@ -31,11 +31,12 @@
 
     <?php
 
-    if (!isset($_POST['rid']))
+    if ((!isset($_POST['rid'])) || (!isset($_POST['title'])))
         {
         return true;
         }
     $rid = $_POST['rid'];
+    $title = $_POST['title'];
 
     // Set the private API key for the user (from the user account page) and the user we're accessing the system as.
     $private_key = "";
@@ -78,6 +79,7 @@
 
     echo '<script type="text/javascript">';
     echo "var rid = "         . $rid         . ";\n";
+    echo "var title = "       . $title       . ";\n";
     echo "var num_pages = "   . $page_count  . ";\n";
     echo "var page_sizes = "  . $image_sizes . ";\n";
     echo "var path_to_pdf = " . $path_to_pdf . ";\n";
