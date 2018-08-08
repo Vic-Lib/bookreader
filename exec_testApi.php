@@ -14,24 +14,16 @@ $q        = $_GET['q'];
 
 if (empty($item_id))
 	{
-	$item_id = "bookreader test";
+	$item_id = "bookreader pdf";
 	}
 
-if (empty($path))
-	{
-	$path = ".";
-	}
-else 
-	{
-	// The relative path to your resourcespace filestore directory
-	$pos           = strpos($path, "filestore");
-	$relative_path = "../../" . substr($path, $pos);
-	$relative_path = escapeshellarg($relative_path);
-	}
+// The relative path to your resourcespace filestore directory
+$pos           = strpos($path, "filestore");
+$relative_path = "../../" . substr($path, $pos);
+$relative_path = escapeshellarg($relative_path);
+$relative_path = "jpgs/test3.pdf";
 
 $item_id = escapeshellarg($item_id);
-$path    = escapeshellarg($path);
-$doc     = escapeshellarg($doc);
 $q       = escapeshellarg(str_replace('"', '', $q));
 $style   = "abbyy";
 
@@ -43,17 +35,23 @@ header('Content-Type: application/json');
 
 $lines        = explode("\n", $output);
 $header_lines = array_slice($lines, 0, 5);
-$text_lines   = array_slice($lines, 5);
+$text_lines   = array();
 
 $cb       = substr($header_lines[0], strpos($header_lines[0], ":") + 1);
 $ia       = substr($header_lines[1], strpos($header_lines[1], ":") + 1);
 $query    = substr($header_lines[2], strpos($header_lines[2], ":") + 1);
 $numPages = substr($header_lines[3], strpos($header_lines[3], ":") + 1);
 
-// Set the private API key for the user (from the user account page) and the user we're accessing the system as.
-$private_key = "";
-$user        = "";
-$url         = "";
+// If there are no matches found, then $output contains the header and 2 newlines.
+if (count($lines) > 6)
+	{ 
+	$text_lines = array_slice($lines, 5);
+
+	// Set the private API key for the user (from the user account page) and the user we're accessing the system as.
+	$private_key = "";
+	$user        = "";
+	$url         = "";
+	}
 
 /***
  * Start of output from exec_testApi.php
@@ -69,6 +67,7 @@ echo $cb . "( {"
 /** 
  * Read the rest of output line by line and echo out the completed json file.
  * Modify the dimensions in $output to work on the actual image size of the jpgs.
+ * If there were no matches found, it won't echo anything.
  */
 foreach ($text_lines as $line)
 	{

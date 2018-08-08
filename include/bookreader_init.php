@@ -77,11 +77,11 @@
     $url_list    = json_encode($url_list);
 
     echo '<script type="text/javascript">';
-    echo "var rid = " . $rid . ";\n";
-    echo "var num_pages = " . $page_count . ";\n";
-    echo "var page_sizes = " . $image_sizes . ";\n";
+    echo "var rid = "         . $rid         . ";\n";
+    echo "var num_pages = "   . $page_count  . ";\n";
+    echo "var page_sizes = "  . $image_sizes . ";\n";
     echo "var path_to_pdf = " . $path_to_pdf . ";\n";
-    echo "var url_list = " . $url_list . ";\n";
+    echo "var url_list = "    . $url_list    . ";\n";
     echo "</script>";
 
     ?>
