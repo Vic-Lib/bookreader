@@ -21,7 +21,6 @@ if (empty($item_id))
 $pos           = strpos($path, "filestore");
 $relative_path = "../../" . substr($path, $pos);
 $relative_path = escapeshellarg($relative_path);
-$relative_path = "jpgs/test3.pdf";
 
 $item_id = escapeshellarg($item_id);
 $q       = escapeshellarg(str_replace('"', '', $q));
