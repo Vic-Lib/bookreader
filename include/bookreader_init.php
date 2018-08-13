@@ -21,7 +21,7 @@
     <script src="../BookReader-source/BookReader/plugins/plugin.search.js"></script>    
 
     <!-- Custom CSS overrides -->
-    <link rel="stylesheet" href="../BookReader-source/BookReaderDemo/BookReaderDemo.css"/>
+    <link rel="stylesheet" href="../css/bookreader_css.css"/>
 
 	<style>
 		html, body { width: 100%; height:100%; margin:0; padding: 0; }
