@@ -62,7 +62,10 @@ var options = {
     metadata: [
         {label: 'Resource ID', value: rid},
         {label: 'Title', value: title},
+        {label: 'Access', value: access},
+        {label: 'Contributed By', value: contributor},
     ],
+    thumbnail: url_list[0],
 
     showLogo: false,
     
