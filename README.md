@@ -8,8 +8,9 @@ For info on writing plugins for ResourceSpace, check out it's [knowledge base](h
 
 ## Status: In Testing
 * Users are able to view pdf's using the BookReader plugin
-* All features should be running (except some links)
-* Searching has been implemented
+* Users are able to run text-based searching
+* All ui's are working except the Share feature which is to be removed
+* About section missing a couple details
 
 
 ## Getting Started
