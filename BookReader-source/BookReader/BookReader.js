@@ -37,7 +37,7 @@ function BookReader(options) {
     this.setup(options);
 }
 
-BookReader.version = "3.0.8";
+BookReader.version = "3.2.1";
 
 // Mode constants
 BookReader.constMode1up = 1;
@@ -52,6 +52,9 @@ BookReader.eventNames = {
 };
 
 BookReader.defaultOptions = {
+    // A string, such as "mode/1up"
+    defaults: null,
+
     // Padding in 1up
     padding: 10,
     // UI mode
@@ -194,8 +197,10 @@ BookReader.prototype.setup = function(options) {
 
     // Private properties below. Configuration should be done with options.
     this.reduce = 4;
+    this.defaults = options.defaults;
     this.padding = options.padding;
     this.mode = this.constMode1up;
+    this.prevReadMode = null;
     this.ui = options.ui;
     this.uiAutoHide = options.uiAutoHide;
 
@@ -362,48 +367,79 @@ BookReader.util = {
     },
 };
 
+/**
+ * Helper to merge in params in to a params object.
+ * It normalizes "page" into the "index" field to disambiguate and prevent concflicts
+ * @private
+ */
+BookReader.prototype.extendParams = function(params, newParams) {
+    var modifiedNewParams = $.extend(true, newParams);
+    if ('undefined' != typeof(modifiedNewParams.page)) {
+        var pageIndex = this.parsePageString(modifiedNewParams.page);
+        if (!isNaN(pageIndex))
+            modifiedNewParams.index = pageIndex;
+        delete modifiedNewParams.page;
+    }
+    $.extend(true, params, modifiedNewParams);
+}
+
+/**
+ * Parses params from from various initialization contexts (url, cookie, options)
+ * @private
+ * @return {object} the parased params
+ */
+BookReader.prototype.initParams = function() {
+    var params = {};
+
+    // This is ordered from lowest to highest priority
+
+    // If we have a title leaf, use that as the default instead of index 0,
+    // but only use as default if book has a few pages
+    if ('undefined' != typeof(this.titleLeaf) && this.getNumLeafs() > 2) {
+        params.index = this.leafNumToIndex(this.titleLeaf);
+    } else {
+        params.index = 0;
+    }
+
+    // this.defaults is a string passed in the url format. eg "page/1/mode/1up"
+    if (this.defaults) {
+        this.extendParams(params, this.paramsFromFragment(this.defaults));
+    }
+
+    // Check for Resume plugin
+    if (this.enablePageResume) {
+        // Check cookies
+        var val = this.getResumeValue();
+        if (val !== null) {
+            params.index = val;
+        }
+    }
+
+    if (this.enableUrlPlugin && window.location.hash) {
+        // params explicitly set in URL take precedence over all other methods
+        var urlParams = this.paramsFromFragment(window.location.hash.substr(1));
+        if (urlParams.mode) {
+            this.prevReadMode = urlParams.mode;
+        }
+        this.extendParams(params, urlParams);
+    }
+
+    return params;
+}
 
 // init()
 //______________________________________________________________________________
 BookReader.prototype.init = function() {
-    //-------------------------------------------------------------------------
-    // Parse parameters from URL/Cookies/Defaults
-    var startIndex = undefined;
     this.pageScale = this.reduce; // preserve current reduce
 
-    // Find start index and mode if set in location hash
-    var params = {};
-    if (this.enableUrlPlugin) {
-        if (window.location.hash) {
-            // params explicitly set in URL
-            params = this.paramsFromFragment(window.location.hash.substr(1));
-        } else if (this.defaults) {
-            // params not explicitly set, use defaults if we have them
-            params = this.paramsFromFragment(this.defaults);
-        }
-    }
+    var params = this.initParams();
 
-    if ('undefined' != typeof(params.index)) {
-        startIndex = params.index;
-    } else if ('undefined' != typeof(params.page)) {
-        startIndex = this.getPageIndex(params.page);
+    // params.index takes precedence over params.page
+    if (params.index) {
+        this.firstIndex = params.index;
+    } else {
+        this.firstIndex = 0;
     }
-    // Check for Resume plugin
-    if ('undefined' == typeof(startIndex) && this.enablePageResume && this.getNumLeafs() > 2) {
-        // Check cookies
-        var val = this.getResumeValue();
-        if (val !== null) {
-            startIndex = val;
-        }
-    }
-    if ('undefined' == typeof(startIndex) && 'undefined' != typeof(this.titleLeaf) && this.getNumLeafs() > 2) {
-        // title leaf is known - but only use as default if book has a few pages
-        startIndex = this.leafNumToIndex(this.titleLeaf);
-    }
-    if ('undefined' == typeof(startIndex)) {
-        startIndex = 0;
-    }
-    this.firstIndex = startIndex;
 
     // Use params or browser width to set view mode
     var windowWidth = $(window).width();
@@ -971,13 +1007,14 @@ BookReader.prototype.drawLeafsThumbnail = function( seekIndex ) {
                 div.style.width = leafWidth + 'px';
                 div.style.height = leafHeight + 'px';
 
-                // link to page in single page mode
+                // link back to page
                 link = document.createElement("a");
                 $(link).data('leaf', leaf);
                 link.addEventListener('mouseup', function(event) {
                   self.firstIndex = $(this).data('leaf');
-                  if (self._prevReadMode !== undefined) {
-                    self.switchMode(self._prevReadMode);
+                  if (self.prevReadMode === self.constMode1up
+                        || self.prevReadMode === self.constMode2up) {
+                    self.switchMode(self.prevReadMode);
                   } else {
                     self.switchMode(self.constMode1up);
                   }
@@ -1520,25 +1557,12 @@ BookReader.prototype._reduceSort = function(a, b) {
     return a.reduce - b.reduce;
 };
 
+
 // jumpToPage()
 //______________________________________________________________________________
 // Attempts to jump to page.  Returns true if page could be found, false otherwise.
 BookReader.prototype.jumpToPage = function(pageNum) {
-
-    var pageIndex;
-
-    // Check for special "leaf"
-    var re = new RegExp('^leaf(\\d+)');
-    leafMatch = re.exec(pageNum);
-    if (leafMatch) {
-        pageIndex = this.leafNumToIndex(parseInt(leafMatch[1],10));
-        if (pageIndex === null) {
-            pageIndex = undefined; // to match return type of getPageIndex
-        }
-
-    } else {
-        pageIndex = this.getPageIndex(pageNum);
-    }
+    var pageIndex = this.parsePageString(pageNum);
 
     if ('undefined' != typeof(pageIndex)) {
         this.jumpToIndex(pageIndex);
@@ -1646,7 +1670,7 @@ BookReader.prototype.jumpToIndex = function(index, pageX, pageY, noAnimate) {
 //______________________________________________________________________________
 BookReader.prototype.switchMode = function(mode) {
 
-    if (mode == this.mode) {
+    if (mode === this.mode) {
         return;
     }
 
@@ -1657,14 +1681,14 @@ BookReader.prototype.switchMode = function(mode) {
     this.trigger('stop');
     if (this.enableSearch) this.removeSearchHilites();
 
-    if (this.mode == this.constMode1up || this.mode == this.constMode2up) {
-      this._prevReadMode = this.mode;
+    if (this.mode === this.constMode1up || this.mode === this.constMode2up) {
+      this.prevReadMode = this.mode;
     }
 
     this.mode = mode;
 
     // reinstate scale if moving from thumbnail view
-    if (this.pageScale != this.reduce) {
+    if (this.pageScale !== this.reduce) {
         this.reduce = this.pageScale;
     }
 
@@ -4504,10 +4528,11 @@ BookReader.prototype.leafNumToIndex = function(index) {
 
 /**
  * Create a params object from the current parameters.
- *
+ * @param {boolean} processParams - pass true to process params
  * @return {Object}
  */
-BookReader.prototype.paramsFromCurrent = function() {
+BookReader.prototype.paramsFromCurrent = function(processParams) {
+    processParams = processParams || false;
 
     var params = {};
 
@@ -4526,6 +4551,13 @@ BookReader.prototype.paramsFromCurrent = function() {
     // search
     if (this.enableSearch) {
         params.searchTerm = this.searchTerm;
+    }
+
+    if (processParams) {
+        // Only include the mode (eg mode/2up) if user has made a choice
+        if (this.prevReadMode == null) {
+            delete params.mode;
+        }
     }
 
     return params;
@@ -4605,7 +4637,7 @@ BookReader.prototype.paramsFromFragment = function(fragment) {
  * Fragments are formatted as a URL path but may be used outside of URLs as a
  * serialization format for BookReader parameters
  *
- * @see http://openlibrary.org/dev/docs/bookurls for fragment syntax
+ * @see https://openlibrary.org/dev/docs/bookurls for fragment syntax
  *
  * @param {Object} params
  * @return {String}
@@ -4649,6 +4681,27 @@ BookReader.prototype.fragmentFromParams = function(params) {
 };
 
 /**
+ * Parses the pageString format
+ * @param {string} pageNum
+ * @return {number|undefined}
+ */
+BookReader.prototype.parsePageString = function(pageNum) {
+    var pageIndex;
+    // Check for special "leaf"
+    var re = new RegExp('^leaf(\\d+)');
+    var leafMatch = re.exec(pageNum);
+    if (leafMatch) {
+        pageIndex = this.leafNumToIndex(parseInt(leafMatch[1], 10));
+        if (pageIndex === null) {
+            pageIndex = undefined; // to match return type of getPageIndex
+        }
+    } else {
+        pageIndex = this.getPageIndex(pageNum);
+    }
+    return pageIndex;
+}
+
+/**
  * Helper. Flatten the nested structure (make 1d array),
  * and also add pageSide prop
  * @return {Array}
@@ -4683,7 +4736,9 @@ BookReader.prototype._getDataFlattened = function() {
  */
 BookReader.prototype._getDataProp = function(index, prop) {
     var dataf = this._getDataFlattened();
-    if (index < 0 || index >= dataf.length)
+    if (isNaN(index) || index < 0 || index >= dataf.length)
+        return;
+    if ('undefined' == typeof(dataf[index][prop]))
         return;
     return dataf[index][prop];
 };
