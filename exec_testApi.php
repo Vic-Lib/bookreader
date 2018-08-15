@@ -1,15 +1,20 @@
 <?php
 
-/**
- * Run the jar file that performs a pdf search on a given term.
- * Capture and modify the results to fit new dimensions.
- * Echo out the resulting json file.
- */
+include "config/config.php";
 
+/**
+ * Run the .jar file that performs a pdf parse/search on a given term and given file.
+ * Capture the results and scale them to fit new dimensions (if sizes are different).
+ * Echo out the resulting json file for the bookreader to read.
+ *
+ * This file helps implement BookReader's full-text search feature. The output needs
+ * to be in the format listed here: https://openlibrary.org/dev/docs/api/search_inside
+**/
+
+// This info is passed from the BookReader api.
 $callback = $_GET['callback'];
 $item_id  = $_GET['item_id'];
 $path     = $_GET['path'];
-$doc      = $_GET['doc'];
 $q        = $_GET['q'];
 
 if (empty($item_id))
@@ -17,22 +22,35 @@ if (empty($item_id))
 	$item_id = "bookreader pdf";
 	}
 
-// The relative path to your resourcespace filestore directory
+// The relative path to your resourcespace -> filestore directory
 $pos           = strpos($path, "filestore");
 $relative_path = "../../" . substr($path, $pos);
 $relative_path = escapeshellarg($relative_path);
 
 $item_id = escapeshellarg($item_id);
 $q       = escapeshellarg(str_replace('"', '', $q));
+
+// "abbyy" or "css", Changes the way coordinates are presented. Don't need to change.
 $style   = "abbyy";
 
+// Execute the shell command to run the .jar file. Uses the Apache PDFBox library.
 $cmd    = "java -jar testApiNew.jar " . $item_id . " " . $relative_path . " " . $q . " '" . $callback . "' '" . $style . "' ";
-$output = shell_exec($cmd);
+$shell_output = shell_exec($cmd);
 
 
 header('Content-Type: application/json');
 
-$lines        = explode("\n", $output);
+/**
+ * Start of true output from exec_testApi.php
+ * The info is passed back to BookReader's search feature.
+ *
+ * The $shell_output contains a header with details about the book followed by any 
+ * matches that followed. You may run the command above on a local pdf file to see 
+ * the format. You only need to provide correct values for the $relative_path and 
+ * $q-(uery), however all arguments must be present.
+ **/
+
+$lines        = explode("\n", $shell_output);
 $header_lines = array_slice($lines, 0, 5);
 $text_lines   = array();
 
@@ -41,21 +59,12 @@ $ia       = substr($header_lines[1], strpos($header_lines[1], ":") + 1);
 $query    = substr($header_lines[2], strpos($header_lines[2], ":") + 1);
 $numPages = substr($header_lines[3], strpos($header_lines[3], ":") + 1);
 
-// If there are no matches found, then $output contains the header and 2 newlines.
+// If there are no matches found, then $shell_output contains the header and 2 newlines.
 if (count($lines) > 6)
 	{ 
 	$text_lines = array_slice($lines, 5);
-
-	// Set the private API key for the user (from the user account page) and the user we're accessing the system as.
-	$private_key = "";
-	$user        = "";
-	$url         = "";
 	}
 
-/***
- * Start of output from exec_testApi.php
- * The info is passed back to BookReader's search feature.
- **/
 echo $cb . "( {" 
 	. "\n\t\"ia\": \"" . $ia .  "\","
     . "\n\t\"q\": \"\\\"" . $query . "\\\"\","
@@ -63,10 +72,12 @@ echo $cb . "( {"
     . "\n\t\"leaf0_missing\": true,"
     . "\n\t\"matches\": [\n";
 
-/** 
+/*
  * Read the rest of output line by line and echo out the completed json file.
- * Modify the dimensions in $output to work on the actual image size of the jpgs.
- * If there were no matches found, it won't echo anything.
+ * Modify the dimensions in $shell_output to reflect the image size of the jpgs
+ * in your resourcespace -> filestore directory.
+ *
+ * If there were no matches found, no results would be shown. "matches: []"
  */
 foreach ($text_lines as $line)
 	{
@@ -90,9 +101,10 @@ foreach ($text_lines as $line)
 		$pgheight   = $dimensions[1];
 		$p6         = $pagenum + 1;
 		
+		// Use the ResourceSpace api to find the location of each page.
 		$query = "user=" . $user . "&function=get_resource_path&param1=" . trim($item_id, '"\'') . "&param2=&param3=scr&param4=&param5=&param6=" . $p6;
-		$sign  = hash("sha256",$private_key . $query);
-		$uri   = file_get_contents($url . "api/?" . $query . "&sign=" . $sign);
+		$sign  = hash("sha256", $private_key . $query);
+		$uri   = file_get_contents($base_url . "api/?" . $query . "&sign=" . $sign);
 
         if ($uri != "")
         	{
