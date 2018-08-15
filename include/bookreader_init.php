@@ -31,53 +31,24 @@
 
     <?php
 
-    if (!isset($_POST['field_rid']))
+    if ((!isset($_POST['field_rid'])) || (!isset($_POST['field_pdf'])) || 
+        (!isset($_POST['field_metadata'])) || (!isset($_POST['field_urls'])))
         {
         return true;
         }
-    $rid = $_POST['field_rid'];
+    $rid         = $_POST['field_rid'];
+    $path_to_pdf = $_POST['field_pdf'];
+    $metadata    = unserialize(base64_decode($_POST['field_metadata']));
+    $url_list    = unserialize(base64_decode($_POST['field_urls']));
 
-    // This info is used for the metadata (about) section.
-    if  ((!isset($_POST['field_title'])) || (!isset($_POST['field_access'])) || (!isset($_POST['field_contrib'])))
-        {
-        return true;
-        }
-    $title       = $_POST['field_title'];
-    $access      = $_POST['field_access'];
-    $contributor = $_POST['field_contrib'];
-
-    // Set the private API key for the user (from the user account page) and the user we're accessing the system as.
-    $private_key = "";
-    $user        = "";
-    $url         = "";
-
-    // Run a query to get the number of pages in the pdf
-    $query      = "user=" . $user . "&function=get_page_count&param1=" . $rid;
-    $sign       = hash("sha256", $private_key . $query);
-    $num_pages  = file_get_contents($url . "api/?" . $query . "&sign=" . $sign);
-    $page_count = str_replace('"', '', $num_pages);
-    
-    // Run a query to get the path to the pdf
-    $query       = "user=" . $user . "&function=get_resource_path&param1=" . $rid . "&param2=&param3=&param4=&param5=pdf&param6=";
-    $sign        = hash("sha256", $private_key . $query);
-    $path_to_pdf = file_get_contents($url . "api/?" . $query . "&sign=" . $sign);
-    $path_to_pdf = str_replace('\\', '', $path_to_pdf);
-
-
+    $page_count  = count($url_list);
     $image_sizes = array();
-    $url_list    = array();
-    // Run queries to get the individual pdf pages
-    for ($i = 1; $i < $page_count + 1; $i++)
-        {
-        $query  = "user=" . $user . "&function=get_resource_path&param1=" . $rid . "&param2=&param3=scr&param4=&param5=&param6=" . $i;
-        $sign   = hash("sha256",$private_key . $query);
-        $uri    = file_get_contents($url . "api/?" . $query . "&sign=" . $sign);
-        $uri    = str_replace('"', '', $uri);
-        $uri    = str_replace('\\', '', $uri);
 
-        list($width, $height) = getimagesize($uri);
+    // Get the dimensions of each of the record's pages.
+    for ($i = 0; $i < $page_count; $i++)
+        {
+        list($width, $height) = getimagesize($url_list[$i]);
         array_push($image_sizes, array($width, $height));
-        array_push($url_list, $uri);
         }
 
     // Pass variables along to javascript
@@ -86,20 +57,19 @@
     $url_list    = json_encode($url_list);
 
     echo '<script type="text/javascript">';
-    echo "var rid = "         . $rid         . ";\n";
-    echo "var title = "       . $title       . ";\n";
-    echo "var access = "      . $access      . ";\n";
-    echo "var contributor = " . $contributor . ";\n";
-    echo "var num_pages = "   . $page_count  . ";\n";
-    echo "var page_sizes = "  . $image_sizes . ";\n";
-    echo "var path_to_pdf = " . $path_to_pdf . ";\n";
-    echo "var url_list = "    . $url_list    . ";\n";
+    echo "var rid = "          . $rid         . ";\n";
+    echo "var title = '"       . $metadata[0] . "';\n";
+    echo "var access = '"      . $metadata[1] . "';\n";
+    echo "var contributor = '" . $metadata[2] . "';\n";
+    echo "var num_pages = "    . $page_count  . ";\n";
+    echo "var page_sizes = "   . $image_sizes . ";\n";
+    echo "var path_to_pdf = '" . $path_to_pdf . "';\n";
+    echo "var url_list = "     . $url_list    . ";\n";
     echo "</script>";
 
     ?>
 
 </head>
-
 <body style="background-color: #939598;">
 
 	<div id="BookReader">
