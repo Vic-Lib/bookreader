@@ -72,7 +72,7 @@ var options = {
     bookId: rid,
     bookPath: path_to_pdf,
     ui: 'full', // embed, full (responsive)
-    searchInsideUrl: "/leslie/resourcespace/plugins/bookreader/exec_testApi.php",
+    searchInsideUrl: "/leslie/resourcespace/plugins/bookreader/search_inside.php",
 
 };
 var br = new BookReader(options);
