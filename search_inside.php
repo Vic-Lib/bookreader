@@ -34,7 +34,7 @@ $q       = escapeshellarg(str_replace('"', '', $q));
 $style   = "abbyy";
 
 // Execute the shell command to run the .jar file. Uses the Apache PDFBox library.
-$cmd    = "java -jar testApiNew.jar " . $item_id . " " . $relative_path . " " . $q . " '" . $callback . "' '" . $style . "' ";
+$cmd    = "java -jar pdfbox_search.jar " . $item_id . " " . $relative_path . " " . $q . " '" . $callback . "' '" . $style . "' ";
 $shell_output = shell_exec($cmd);
 
 
