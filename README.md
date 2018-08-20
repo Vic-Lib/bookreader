@@ -1,12 +1,8 @@
 # Bookreader Plugin for Resourcespace
 
-Internet Archive BookReader, an open-source online book viewer is now available as a plugin for ResourceSpace. IA BookReader comes with many unique features such as text search and is also mobile friendly. For more information on BookReader you can view the README in BookReader-source or visit their website in the link below. ResourceSpace is an online digital asset management software and is also open source. For more information you may also visit their website below. We will use ResourceSpace's plugin system to make modifications to our site.
+Internet Archive BookReader, an open-source online book viewer is now available as a plugin for ResourceSpace. IA BookReader comes with many unique features such as text search and is also mobile friendly. ResourceSpace is an online digital asset management software and is also open source. For more information on BookReader or ResourceSpace you can view the README in BookReader-source or visit their websites in **Tools & Documentation**.
 
-The Internet Archive Bookreader: https://openlibrary.org/dev/docs/bookreader.
-
-ResourceSpace: https://www.resourcespace.com/.
-
-For info on writing plugins for ResourceSpace, check out the [knowledge base](https://www.resourcespace.com/knowledge-base/systemadmin/modifications-and-writing-your-own-plugin).
+![Bookreader example](img/search_demo.png)
 
 
 ## Getting Started
@@ -28,13 +24,13 @@ Once finished, make sure to save and depending on how you plan to enable the plu
 ### Enabling the plugin
 There are two ways to add the plugins to resourcespace outlined in the knowledge base under [Managing Plugins](https://www.resourcespace.com/knowledge-base/systemadmin/managing_plugins).
 
-If you plan to use the plugin manager, then you will need to package the plugin and upload it to resourcespace.
+If you plan to use the **plugin manager**, then you will need to package the plugin and upload it to resourcespace.
 * Perform a tar and gzip on the plugin (`bookreader.tar.gz`)
 * Rename the zipped file to `bookreader.rsp`
 
 This creates a ResourceSpace plugin file that you can upload. Now continue to follow the steps in the link [Managing Plugins](https://www.resourcespace.com/knowledge-base/systemadmin/managing_plugins) under The Plugin Manager. **Note** that this is the recommended way of enabling plugins safely and easily.
 
-If you plan to manually configurate the files then I will outline possible steps.
+If you plan to **manually configurate** the files then I will outline possible steps.
 * Grab the entire bookreader folder and place it into your `.../resourcespace/plugins/` folder
 * Enable the plugin by adding bookreader to `$plugins` in `include/config.php` with the line:
 ```
@@ -44,8 +40,23 @@ $plugins = 'bookreader';
 ```
 **Note** that I have not tested this out with other plugins.
 
+
+### Tools & Documentation
+* Internet Archive Bookreader [home page](https://openlibrary.org/dev/docs/bookreader).
+
+* Internet Archive Bookreader [github](https://github.com/internetarchive/bookreader).
+
+* ResourceSpace [home page](https://www.resourcespace.com/).
+
+* ResourceSpace knowledge base link for [writing your own plugin](https://www.resourcespace.com/knowledge-base/systemadmin/modifications-and-writing-your-own-plugin).
+
+* ResourceSpace knowledge base link for [RESTful API](https://www.resourcespace.com/knowledge-base/api/).
+
+* To parse pdf documents, [Apache PDFBox](https://pdfbox.apache.org/).
+
+
 ### Additional Info
-To better understand the job of `search_inside.php` I will provide a short demo/walkthrough below. I will perform a run on a local file. In the live version, the shell command will be passed to you through BookReader.
+To better understand the job of `search_inside.php` I will provide a short demo/walkthrough below. I will perform a run on a local file. In the live version, the shell command will be passed to you through BookReader. The end goal should be formatted as written [here](https://openlibrary.org/dev/docs/api/search_inside).
 
 Here is the result for entering the command on a local file `test.pdf` and searching for the text `Ancient`:
 ```
@@ -104,9 +115,4 @@ jQuery1234567890( {
 ] 
 } )
 ```
-which matches the criteria laid out on https://openlibrary.org/dev/docs/api/search_inside. If there are no results, the header will be displayed and `"matches": []`.
-
-I'm hoping this provides a better understanding of how the code works.
-
-### Other Credits
-To parse pdf documents and grab the search results for BookReader, we used [Apache PDFBox](https://pdfbox.apache.org/).
+The walkthrough for `search_inside.php` is finished. For info on how BookReader handles the json text, you can read the `plugin.search.js` code located inside `BookReader-souce/BookReader/plugins`. I hope this provides a better understanding of how the code works.

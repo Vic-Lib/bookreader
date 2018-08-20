@@ -8,7 +8,9 @@ include "config/config.php";
  * Echo out the resulting json file for the bookreader to read.
  *
  * This file helps implement BookReader's full-text search feature. The output needs
- * to be in the format listed here: https://openlibrary.org/dev/docs/api/search_inside
+ * to be in the format listed here: https://openlibrary.org/dev/docs/api/search_inside.
+ * For an example of the output we generate, have a look at the README or try breaking 
+ * it down and testing it yourself.
 **/
 
 // This info is passed from the BookReader api.
@@ -102,6 +104,7 @@ foreach ($text_lines as $line)
 		$p6         = $pagenum + 1;
 		
 		// Use the ResourceSpace api to find the location of each page.
+		// For info visit: https://www.resourcespace.com/knowledge-base/api/
 		$query = "user=" . $user . "&function=get_resource_path&param1=" . trim($item_id, '"\'') . "&param2=&param3=scr&param4=&param5=&param6=" . $p6;
 		$sign  = hash("sha256", $private_key . $query);
 		$uri   = file_get_contents($base_url . "api/?" . $query . "&sign=" . $sign);
