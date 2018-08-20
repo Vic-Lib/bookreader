@@ -16,17 +16,18 @@ function HookBookreaderViewRenderbeforerecorddownload()
     $udata       = get_user($resource["created_by"]);
     $contributor = $udata["fullname"];
     $metadata    = array($title, $access, $contributor);
+
     /*
      Grab the .pdf path to the record in filestore. 
      Grab the .jpg paths of all the record's pages in filestore.
      */
-    $path_to_pdf = get_resource_path($resource['ref'], false, '', false, $resource['file_extension'], -1, 1, $use_watermark, '', -1, false);
+    $path_to_pdf = get_resource_path($ref, false, '', false, $resource['file_extension'], -1, 1, $use_watermark, '', -1, false);
     $url_list    = array();
     $page_count  = get_page_count($resource);
 
     for ($i = 1; $i < $page_count + 1; $i++)
         {
-        $url = getPreviewURL($resource, -1, $i);
+        $url = get_resource_path($ref, false, 'scr', false,  $resource['preview_extension'], -1, $i, false, '', -1, true);
         array_push($url_list, $url);
         }
     ?>
@@ -51,7 +52,6 @@ function HookBookreaderViewRenderbeforerecorddownload()
             jQuery("body").append('<iframe id="br-content" name="br-content" style="width:100%; height:100%; position:fixed; z-index:3; display:none;" src="../plugins/bookreader/include/bookreader_init.php"></iframe>');
             }
     </script>
-
     <?php
     }
 
@@ -76,10 +76,24 @@ function HookBookreaderViewReplacepreviewlink()
                 jQuery("#br-overlay").css("display", "none");
                 jQuery("#br-content").css("display", "none");
                 }
-        </script>
-
+        </script>      
 	<?php
 	return true;
+    }
+
+function HookBookreaderViewAftersearchimg_disabled()
+    {
+    global $ref, $lang, $resource, $use_watermark;
+
+    $imageurl = get_resource_path($ref, false, 'pre', false, $resource['preview_extension'], true, 1, false);
+    ?>
+    <script type="text/javascript">
+        var prev_img = document.getElementById("previewimage");
+        if (prev_img == null){
+            jQuery("#previewLink").append('<img id="previewimage" class="Picture" src="<?php echo $imageurl; ?>" alt="<?php echo $lang['fullscreenpreview']; ?>" GALLERYIMG="no"/>');
+        }
+    </script>
+    <?php
     }
 
 ?>
