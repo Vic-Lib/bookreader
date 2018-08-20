@@ -32,11 +32,13 @@
     <?php
 
     if ((!isset($_POST['field_rid'])) || (!isset($_POST['field_pdf'])) || 
-        (!isset($_POST['field_metadata'])) || (!isset($_POST['field_urls'])))
+        (!isset($_POST['field_metadata'])) || (!isset($_POST['field_urls'])) ||
+        (!isset($_POST['field_dir'])))
         {
         return true;
         }
     $rid         = $_POST['field_rid'];
+    $rs_dir      = $_POST['field_dir'];
     $path_to_pdf = $_POST['field_pdf'];
     $metadata    = unserialize(base64_decode($_POST['field_metadata']));
     $url_list    = unserialize(base64_decode($_POST['field_urls']));
@@ -58,6 +60,7 @@
 
     echo '<script type="text/javascript">';
     echo "var rid = "          . $rid         . ";\n";
+    echo "var rs_dir = '"      . $rs_dir      . "';\n";
     echo "var title = '"       . $metadata[0] . "';\n";
     echo "var access = '"      . $metadata[1] . "';\n";
     echo "var contributor = '" . $metadata[2] . "';\n";

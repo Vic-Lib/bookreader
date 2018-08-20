@@ -3,12 +3,12 @@
  */
 
 jQuery.extend(true, BookReader.defaultOptions, {
-    server: '128.100.124.214',
+    server: '',
     bookId: '',
     subPrefix: '',
     bookPath: '',
     enableSearch: true,
-    searchInsideUrl: '/fulltext/inside.php',
+    searchInsideUrl: '',
 });
 
 // Extend the constructor to add search properties

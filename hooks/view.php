@@ -2,7 +2,10 @@
 
 function HookBookreaderViewRenderbeforerecorddownload()
     {
-    global $baseurl, $ref, $lang, $title_field, $resource, $use_watermark;
+    global $baseurl, $ref, $lang, $title_field, $resource, $use_watermark, $baseurl_short;
+
+    // Grab the domain name
+    $rs_dir = substr($baseurl, strpos($baseurl, "//") + 2);
     
     /* 
      Grab the metadata info for the record
@@ -13,7 +16,6 @@ function HookBookreaderViewRenderbeforerecorddownload()
     $udata       = get_user($resource["created_by"]);
     $contributor = $udata["fullname"];
     $metadata    = array($title, $access, $contributor);
-
     /*
      Grab the .pdf path to the record in filestore. 
      Grab the .jpg paths of all the record's pages in filestore.
@@ -31,6 +33,7 @@ function HookBookreaderViewRenderbeforerecorddownload()
 
     <form id="resourceId" action="../plugins/bookreader/include/bookreader_init.php" target="br-content" method="post">
         <input type="hidden" name="field_rid"      value= "<?php echo $ref;?>">
+        <input type="hidden" name="field_dir"      value= "<?php echo $rs_dir;?>">
         <input type="hidden" name="field_pdf"      value= "<?php echo $path_to_pdf;?>">
         <input type="hidden" name="field_metadata" value="'<?php print base64_encode(serialize($metadata));?>'">
         <input type="hidden" name="field_urls"     value="'<?php print base64_encode(serialize($url_list));?>'">
