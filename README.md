@@ -1,8 +1,8 @@
 # Bookreader Plugin for Resourcespace
 
-Internet Archive BookReader, an open-source online book viewer is now available as a plugin for ResourceSpace. IA BookReader comes with many unique features such as text search and is also mobile friendly. ResourceSpace is an online digital asset management software and is also open source. For more information on BookReader or ResourceSpace you can view the README in BookReader-source or visit their websites in **Tools & Documentation**.
-
 ![Bookreader example](img/search_demo.png)
+
+Internet Archive BookReader, an open-source online book viewer is now available as a plugin for ResourceSpace. IA BookReader comes with many unique features such as text search and is also mobile friendly. ResourceSpace is an online digital asset management software and is also open source. For more information on BookReader or ResourceSpace you can view the README in BookReader-source or visit their websites in **Tools & Documentation**.
 
 
 ## Getting Started
@@ -115,4 +115,4 @@ jQuery1234567890( {
 ] 
 } )
 ```
-The walkthrough for `search_inside.php` is finished. For info on how BookReader handles the json text, you can read the `plugin.search.js` code located inside `BookReader-souce/BookReader/plugins`. I hope this provides a better understanding of how the code works.
+The walkthrough for `search_inside.php` is finished. For info on how BookReader handles the json text, you can read the `plugin.search.js` code located inside `BookReader-source/BookReader/plugins`. I hope this provides a better understanding of how the code works.
