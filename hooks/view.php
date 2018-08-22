@@ -4,12 +4,12 @@ function HookBookreaderViewRenderbeforerecorddownload()
     {
     global $baseurl, $ref, $lang, $title_field, $resource, $use_watermark, $baseurl_short;
 
-    // Grab the domain name
+    // Grab the path to the resourcespace folder
     $rs_dir = substr($baseurl, strpos($baseurl, "//") + 2);
     
     /* 
      Grab the metadata info for the record
-     include fields: title, access, contributed by
+     included fields: title, access, contributed by
      */
     $title       = get_data_by_field($resource['ref'], $title_field);
     $access      = $lang["access" . $resource["access"]];
@@ -64,7 +64,7 @@ function HookBookreaderViewReplacepreviewlink()
             function displayBR()
                 {
                 ModalClose();
-                jQuery("body").append('<span id="close-frame" onclick="closeBR()" style="font-size:1.1em; color:rgb(70,150,224); top:0.8em; left:0.8em; position:fixed; z-index:3; cursor:pointer;">✖ close</span>');
+                jQuery("body").append('<span id="close-frame" onclick="closeBR()" style="font-size:1.1em; color:rgb(70,150,225); top:0.8em; left:0.8em; position:fixed; z-index:3; cursor:pointer;">✖ close</span>');
                 jQuery("#br-overlay").css("display", "block");
                 jQuery("#br-content").css("display", "block");
                 }
@@ -81,16 +81,27 @@ function HookBookreaderViewReplacepreviewlink()
 	return true;
     }
 
-function HookBookreaderViewAftersearchimg_disabled()
+function HookBookreaderViewAftersearchimg()
     {
+    /*
+      This hook allows for a preview link to be present even when not signed in.
+      However the BookReader viewer only works for viewing but not searching.
+     */
+      
     global $ref, $lang, $resource, $use_watermark;
 
-    $imageurl = get_resource_path($ref, false, 'pre', false, $resource['preview_extension'], true, 1, false);
+    $file_path = get_resource_path($ref, true, 'pre', false, $resource['preview_extension'], true, 1, false);
+    $url_path  = get_resource_path($ref, false, 'pre', false, $resource['preview_extension'], true, 1, false);
+
+    if(!file_exists($file_path))
+        {
+        return false;
+        }
     ?>
     <script type="text/javascript">
         var prev_img = document.getElementById("previewimage");
         if (prev_img == null){
-            jQuery("#previewLink").append('<img id="previewimage" class="Picture" src="<?php echo $imageurl; ?>" alt="<?php echo $lang['fullscreenpreview']; ?>" GALLERYIMG="no"/>');
+            jQuery("#previewLink").append('<img id="previewimage" class="Picture" src="<?php echo $url_path; ?>" alt="<?php echo $lang['fullscreenpreview']; ?>" GALLERYIMG="no"/>');
         }
     </script>
     <?php

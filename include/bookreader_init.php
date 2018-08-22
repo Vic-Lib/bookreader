@@ -37,6 +37,8 @@
         {
         return true;
         }
+        
+    // Retrieve fields passed by view.php
     $rid         = $_POST['field_rid'];
     $rs_dir      = $_POST['field_dir'];
     $path_to_pdf = $_POST['field_pdf'];
@@ -58,7 +60,7 @@
     $image_sizes = json_encode($image_sizes);
     $url_list    = json_encode($url_list);
 
-    echo '<script type="text/javascript">';
+    echo '<script type="text/javascript">'    . "\n";
     echo "var rid = "          . $rid         . ";\n";
     echo "var rs_dir = '"      . $rs_dir      . "';\n";
     echo "var title = '"       . $metadata[0] . "';\n";
