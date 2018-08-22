@@ -29,11 +29,12 @@ $pos           = strpos($path, "filestore");
 $relative_path = "../../" . substr($path, $pos);
 $relative_path = escapeshellarg($relative_path);
 
-$item_id = escapeshellarg($item_id);
-$q       = escapeshellarg(str_replace('"', '', $q));
+$callback = escapeshellarg($callback);
+$item_id  = escapeshellarg($item_id);
+$q        = escapeshellarg(str_replace('"', '', $q));
 
 // "abbyy" or "css", Changes the way coordinates are presented. Don't need to change.
-$style   = "abbyy";
+$style   = escapeshellarg("abbyy");
 
 // Execute the shell command to run the .jar file. Uses the Apache PDFBox library.
 $cmd    = "java -jar pdfbox_search.jar " . $item_id . " " . $relative_path . " " . $q . " '" . $callback . "' '" . $style . "' ";
@@ -101,11 +102,11 @@ foreach ($text_lines as $line)
 		$ratio_h    = 1.0;
 		$pgwidth    = $dimensions[0];
 		$pgheight   = $dimensions[1];
-		$p6         = $pagenum + 1;
+		$param6     = $pagenum + 1;
 		
 		// Use the ResourceSpace api to find the location of each page.
 		// For info visit: https://www.resourcespace.com/knowledge-base/api/
-		$query = "user=" . $user . "&function=get_resource_path&param1=" . trim($item_id, '"\'') . "&param2=&param3=scr&param4=&param5=&param6=" . $p6;
+		$query = "user=" . $user . "&function=get_resource_path&param1=" . trim($item_id, '"\'') . "&param2=&param3=scr&param4=&param5=&param6=" . $param6;
 		$sign  = hash("sha256", $private_key . $query);
 		$uri   = file_get_contents($base_url . "api/?" . $query . "&sign=" . $sign);
 
