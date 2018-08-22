@@ -12,11 +12,9 @@ Go into the config folder and edit the `config.php` file. There are 3 variables 
 ```
 $private_key = "your_private_api_key"
 $user        = "username"
-$url         = ".../path/to/resourcespace/"
+$url         = "http://.../path/to/resourcespace/"
 ```
-You will need to get your `private API key` from the resourcespace user accounts page. You can get there by going to your resourcespace instance and hitting `Admin -> Manage users` and locating your `username`. 
-
-You will already know your `username` and the `url` is just the full path to the directory that your resourcespace instance is stored in.
+The `$user` and `$url` are your resourcespace username and resourcespace address. You can find your `private API key` from the user accounts page. You can get there by going to your resourcespace instance and hitting `Admin -> Manage users` and locating your `username`.
 
 Once finished, make sure to save and depending on how you plan to enable the plugin, you may or may not need to package your plugin. Continued in **Enabling the plugin**.
 
@@ -25,21 +23,26 @@ Once finished, make sure to save and depending on how you plan to enable the plu
 There are two ways to add the plugins to resourcespace outlined in the knowledge base under [Managing Plugins](https://www.resourcespace.com/knowledge-base/systemadmin/managing_plugins).
 
 If you plan to use the **plugin manager**, then you will need to package the plugin and upload it to resourcespace.
-* Perform a tar and gzip on the plugin (`bookreader.tar.gz`)
-* Rename the zipped file to `bookreader.rsp`
+* Perform a tar and gzip on the plugin resulting in `bookreader.tar.gz`.
+* Rename the zipped file to `bookreader.rsp`.
 
-This creates a ResourceSpace plugin file that you can upload. Now continue to follow the steps in the link [Managing Plugins](https://www.resourcespace.com/knowledge-base/systemadmin/managing_plugins) under The Plugin Manager. **Note** that this is the recommended way of enabling plugins safely and easily.
+This creates a ResourceSpace plugin file that you can upload. Now continue to follow the steps in the link [Managing Plugins](https://www.resourcespace.com/knowledge-base/systemadmin/managing_plugins) under The Plugin Manager. **Note** that this is the recommended way of enabling plugins safely and easily according to the resourcespace page.
 
 If you plan to **manually configurate** the files then I will outline possible steps.
-* Grab the entire bookreader folder and place it into your `.../resourcespace/plugins/` folder
+
+* Grab the entire bookreader folder and place it into your `.../resourcespace/plugins/` folder. 
 * Enable the plugin by adding bookreader to `$plugins` in `include/config.php` with the line:
 ```
 array_push($plugins, 'bookreader');
 // or 
 $plugins = 'bookreader';
 ```
-**Note** that I have not tested this out with other plugins.
-
+**Alternatively**, you can try these steps.
+* Grab the entire bookreader folder and place it into your `.../resourcespace/plugins/` folder manually.
+* Open up your resourcespace instance on the web and log in as an admin.
+* Go to the plugin manager by choosing `Admin -> System -> Manage plugins`.
+* Find the bookreader plugin in the available plugins list or search for it using the search bar.
+* Click *Activate* to enable the plugin.
 
 ### Tools & Documentation
 * Internet Archive Bookreader [home page](https://openlibrary.org/dev/docs/bookreader).
@@ -52,11 +55,11 @@ $plugins = 'bookreader';
 
 * ResourceSpace knowledge base link for [RESTful API](https://www.resourcespace.com/knowledge-base/api/).
 
-* To parse pdf documents, [Apache PDFBox](https://pdfbox.apache.org/).
+* Apache PDFBox, a [Java PDF library](https://pdfbox.apache.org/).
 
 
 ### Additional Info
-To better understand the job of `search_inside.php` I will provide a short demo/walkthrough below. I will perform a run on a local file. In the live version, the shell command will be passed to you through BookReader. The end goal should be formatted as written [here](https://openlibrary.org/dev/docs/api/search_inside).
+To better understand the job of `search_inside.php` I will provide a short demo/walkthrough below. I will perform a run on a local file. In the live version, the shell command will be passed to you through BookReader. The output of the file should look similar to [this](https://openlibrary.org/dev/docs/api/search_inside).
 
 Here is the result for entering the command on a local file `test.pdf` and searching for the text `Ancient`:
 ```
@@ -115,4 +118,4 @@ jQuery1234567890( {
 ] 
 } )
 ```
-The walkthrough for `search_inside.php` is finished. For info on how BookReader handles the json text, you can read the `plugin.search.js` code located inside `BookReader-source/BookReader/plugins`. I hope this provides a better understanding of how the code works.
+It is now in the correct format and the BookReader search plugin will handle the output. For info on how BookReader does this, you can read the code in `BookReader-source/BookReader/plugins/plugins.search.js`. I hope this helped.
