@@ -44,6 +44,14 @@ $plugins = 'bookreader';
 * Find the bookreader plugin in the available plugins list or search for it using the search bar.
 * Click *Activate* to enable the plugin.
 
+
+### Disabling the plugin
+Disabling the plugin is very easy and only requires a few steps. If you enabled the plugin by **manually configurating** the `include/config.php` file, you will need to comment out or remove `bookreader` from `$plugins` first.
+* Open up your resourcespace instance on the web and log in as an admin.
+* Go to the plugin manager by choosing `Admin -> System -> Manage plugins`.
+* Click *Deactivate* to disable the plugin.
+
+
 ### Tools & Documentation
 * Internet Archive Bookreader [home page](https://openlibrary.org/dev/docs/bookreader).
 
