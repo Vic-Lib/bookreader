@@ -1,9 +1,10 @@
-# Bookreader Plugin for Resourcespace
-
 ![Bookreader example](img/search_demo.png)
+
+# Bookreader Plugin for Resourcespace
 
 Internet Archive BookReader, an open-source online book viewer is now available as a plugin for ResourceSpace. IA BookReader comes with many unique features such as text search and is also mobile friendly. ResourceSpace is an online digital asset management software and is also open source. For more information on BookReader or ResourceSpace you can view the README in BookReader-source or visit their websites in **Tools & Documentation**.
 
+---
 
 ## Getting Started
 Start by getting a copy of the repo.
@@ -18,8 +19,9 @@ The `$user` and `$url` are your resourcespace username and resourcespace address
 
 Once finished, make sure to save and depending on how you plan to enable the plugin, you may or may not need to package your plugin. Continued in **Enabling the plugin**.
 
+---
 
-### Enabling the plugin
+## Enabling the plugin
 There are two ways to add the plugins to resourcespace outlined in the knowledge base under [Managing Plugins](https://www.resourcespace.com/knowledge-base/systemadmin/managing_plugins).
 
 If you plan to use the **plugin manager**, then you will need to package the plugin and upload it to resourcespace.
@@ -44,15 +46,15 @@ $plugins = 'bookreader';
 * Find the bookreader plugin in the available plugins list or search for it using the search bar.
 * Click *Activate* to enable the plugin.
 
-
-### Disabling the plugin
+## Disabling the plugin
 Disabling the plugin is very easy and only requires a few steps. If you enabled the plugin by **manually configurating** the `include/config.php` file, you will need to comment out or remove `bookreader` from `$plugins` first.
 * Open up your resourcespace instance on the web and log in as an admin.
 * Go to the plugin manager by choosing `Admin -> System -> Manage plugins`.
 * Click *Deactivate* to disable the plugin.
 
+---
 
-### Tools & Documentation
+## Tools & Documentation
 * Internet Archive Bookreader [home page](https://openlibrary.org/dev/docs/bookreader).
 
 * Internet Archive Bookreader [github](https://github.com/internetarchive/bookreader).
@@ -65,8 +67,9 @@ Disabling the plugin is very easy and only requires a few steps. If you enabled 
 
 * Apache PDFBox, a [Java PDF library](https://pdfbox.apache.org/).
 
+---
 
-### Additional Info
+## Additional Info
 To better understand the job of `search_inside.php` I will provide a short demo/walkthrough below. I will perform a run on a local file. In the live version, the shell command will be passed to you through BookReader. The output of the file should look similar to [this](https://openlibrary.org/dev/docs/api/search_inside).
 
 Here is the result for entering the command on a local file `test.pdf` and searching for the text `Ancient`:
