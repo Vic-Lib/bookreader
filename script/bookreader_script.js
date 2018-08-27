@@ -12,7 +12,15 @@ var options = {
     getPageWidth: function(index) { 
         return page_sizes[index][0];
     },
-    getPageHeight: function(index) { 
+    getPageHeight: function(index) {
+        // If you are switching from two-page to one-page view on the very first page, BookReader 
+        // actually tries to find the height of the empty left page.
+        //
+        // Another way to deal with this is to create a "dummy" first page and start index at 1.
+
+        if (index == -1){
+            return page_sizes[0][1];
+        }
         return page_sizes[index][1];
     },
     getPageURI: function(index, reduce, rotate) {
