@@ -19,26 +19,17 @@ $item_id  = $_GET['item_id'];
 $path     = $_GET['path'];
 $q        = $_GET['q'];
 
-if (empty($item_id))
-	{
-	$item_id = "bookreader pdf";
-	}
-
-// The relative path to your resourcespace -> filestore directory
-$pos           = strpos($path, "filestore");
-$relative_path = "../../" . substr($path, $pos);
-$relative_path = escapeshellarg($relative_path);
-
 $callback = escapeshellarg($callback);
 $item_id  = escapeshellarg($item_id);
+$path     = escapeshellarg($path);
 $q        = escapeshellarg(str_replace('"', '', $q));
 
 // "abbyy" or "css", Changes the way coordinates are presented. Don't need to change.
-$style   = escapeshellarg("abbyy");
+$style = escapeshellarg("abbyy");
 
 // Execute the shell command to run the .jar file. Uses the Apache PDFBox library.
-$cmd    = "java -jar pdfbox_search.jar " . $item_id . " " . $relative_path . " " . $q . " '" . $callback . "' '" . $style . "' ";
-$shell_output = shell_exec($cmd);
+$script = "java -jar pdfbox_search.jar " . $item_id . " " . $path . " " . $q . " '" . $callback . "' '" . $style . "' ";
+$shell_output = shell_exec($script);
 
 
 header('Content-Type: application/json');

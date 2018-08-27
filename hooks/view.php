@@ -21,7 +21,7 @@ function HookBookreaderViewRenderbeforerecorddownload()
      Grab the .pdf path to the record in filestore. 
      Grab the .jpg paths of all the record's pages in filestore.
      */
-    $path_to_pdf = get_resource_path($ref, false, '', false, $resource['file_extension'], -1, 1, $use_watermark, '', -1, false);
+    $path_to_pdf = get_resource_path($ref, true, '', false, $resource['file_extension'], -1, 1, $use_watermark, '', -1, false);
     $url_list    = array();
     $page_count  = get_page_count($resource);
 
