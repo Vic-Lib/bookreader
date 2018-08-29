@@ -22,14 +22,16 @@ $q        = $_GET['q'];
 $callback = escapeshellarg($callback);
 $item_id  = escapeshellarg($item_id);
 $path     = escapeshellarg($path);
-$q        = escapeshellarg(str_replace('"', '', $q));
+
+// Mimic's escapeshellarg except that it doesn't remove special characters (like é).
+$q = "'" . str_replace("'", "\'", trim($q, '"')) . "'";
 
 // "abbyy" or "css", Changes the way coordinates are presented. Don't need to change.
 $style = escapeshellarg("abbyy");
 
 // Execute the shell command to run the .jar file. Uses the Apache PDFBox library.
-$script = "java -jar pdfbox_search.jar " . $item_id . " " . $path . " " . $q . " '" . $callback . "' '" . $style . "' ";
-$shell_output = shell_exec($script);
+$script       = "java -jar pdfbox_search.jar " . $item_id . " " . $path . " " . $q . " '" . $callback . "' '" . $style . "' ";
+$shell_output = shell_exec('LANG="en_US.utf-8"; ' . $script);
 
 
 header('Content-Type: application/json');
