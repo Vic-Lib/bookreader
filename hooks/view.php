@@ -67,6 +67,7 @@ function HookBookreaderViewReplacepreviewlink()
                 jQuery("body").append('<span id="close-frame" onclick="closeBR()" style="font-size:1.1em; color:rgb(70,150,225); top:0.8em; left:0.8em; position:fixed; z-index:3; cursor:pointer;">✖ close</span>');
                 jQuery("#br-overlay").css("display", "block");
                 jQuery("#br-content").css("display", "block");
+                jQuery("#br-content").focus();
                 }
 
             function closeBR()
