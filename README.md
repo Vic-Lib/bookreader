@@ -2,7 +2,7 @@
 
 # Bookreader Plugin for Resourcespace
 
-Internet Archive BookReader, an open-source online book viewer is now available as a plugin for ResourceSpace. IA BookReader comes with many unique features such as text search and is also mobile friendly. ResourceSpace is an online digital asset management software and is also open source. For more information on BookReader or ResourceSpace you can view the README in BookReader-source or visit their websites in **Tools & Documentation**.
+Internet Archive BookReader, an open-source online book viewer is now available as a plugin for ResourceSpace. IA BookReader comes with many unique features such as text search and is also mobile friendly. ResourceSpace is an online digital asset management software and is also open source. For more information on BookReader or ResourceSpace you can view the `README` in `BookReader-source` or visit their websites in **Tools & Documentation**.
 
 ---
 
@@ -67,10 +67,12 @@ Disabling the plugin is very easy and only requires a few steps. If you enabled 
 
 * Apache PDFBox, a [Java PDF library](https://pdfbox.apache.org/).
 
+* My Java code behind pdfbox_search.jar on [github](https://github.com/leslie-lau/fulltextsearch)
+
 ---
 
 ## Additional Info
-To better understand the job of `search_inside.php` I will provide a short demo/walkthrough below. I will perform a run on a local file. In the live version, the shell command will be passed to you through BookReader. The output of the file should look similar to [this](https://openlibrary.org/dev/docs/api/search_inside).
+To better understand the job of `search_inside.php` I will provide a short demo/walkthrough below. Running `search_inside.php` will call `pdfbox_search.jar`, so it may be worth having a look at it's Java code in this [repo](https://github.com/leslie-lau/fulltextsearch). I will perform a run on a local file. In the live version, the shell command will be passed to you through BookReader. The output of the file should match BookReader's [search api](https://openlibrary.org/dev/docs/api/search_inside). 
 
 Here is the result for entering the command on a local file `test.pdf` and searching for the text `Ancient`:
 ```
