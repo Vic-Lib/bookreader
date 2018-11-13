@@ -1,7 +1,7 @@
 <?php
 
-include "config/config.php";
-
+include_once "../../include/general.php";
+include_once "../../include/db.php";
 /**
  * Run the .jar file that performs a pdf parse/search on a given term and given file.
  * Capture the results and scale them to fit new dimensions (if sizes are different).
@@ -16,9 +16,13 @@ include "config/config.php";
 // This info is passed from the BookReader api.
 $callback = $_GET['callback'];
 $item_id  = $_GET['item_id'];
-$path     = $_GET['path'];
 $q        = $_GET['q'];
 
+// get the path from Resource Space
+$resource = get_resource_data($item_id);
+$path     = get_resource_path($item_id, true, '', false, $resource['file_extension'], -1, 1, false, '', -1, false);
+
+// translates to shell format
 $callback = escapeshellarg($callback);
 $item_id  = escapeshellarg($item_id);
 $path     = escapeshellarg($path);
@@ -99,9 +103,11 @@ foreach ($text_lines as $line)
 		
 		// Use the ResourceSpace api to find the location of each page.
 		// For info visit: https://www.resourcespace.com/knowledge-base/api/
-		$query = "user=" . $user . "&function=get_resource_path&param1=" . trim($item_id, '"\'') . "&param2=&param3=scr&param4=&param5=&param6=" . $param6;
-		$sign  = hash("sha256", $private_key . $query);
-		$uri   = file_get_contents($base_url . "api/?" . $query . "&sign=" . $sign);
+		// $query = "user=" . $user . "&function=get_resource_path&param1=" . trim($item_id, '"\'') . "&param2=&param3=scr&param4=&param5=&param6=" . $param6;
+		// $sign  = hash("sha256", $private_key . $query);
+		// $uri   = file_get_contents($base_url . "api/?" . $query . "&sign=" . $sign);
+
+		$uri   = get_resource_path(trim($item_id, '"\''),  true, '');
 
         if ($uri != "")
         	{

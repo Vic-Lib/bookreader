@@ -27,36 +27,49 @@
 		html, body { width: 100%; height:100%; margin:0; padding: 0; }
         #BookReader { width: 100%; height:100%; }
 	</style>
-
-
+    
     <?php
+    include_once "../../../include/general.php";
+    include_once "../../../include/db.php";
+    include_once "../../../include/resource_functions.php";
+    include "../getimagesize_helper.php";
 
-    if ((!isset($_POST['field_rid'])) || (!isset($_POST['field_pdf'])) || 
-        (!isset($_POST['field_metadata'])) || (!isset($_POST['field_urls'])) ||
-        (!isset($_POST['field_dir'])))
-        {
+    global $title_field, $baseurl;
+
+    /// Get metadata for BookReader initialization ///
+
+    if (isset($_GET['ref'])) {
+        $rid = $_GET['ref'];
+        } else {
         return true;
         }
-        
-    // Retrieve fields passed by view.php
-    $rid         = $_POST['field_rid'];
-    $rs_dir      = $_POST['field_dir'];
-    $path_to_pdf = $_POST['field_pdf'];
-    $metadata    = unserialize(base64_decode($_POST['field_metadata']));
-    $url_list    = unserialize(base64_decode($_POST['field_urls']));
 
-    $page_count  = count($url_list);
-    $image_sizes = array();
+    $resource = get_resource_data($rid);
 
-    // Get the dimensions of each of the record's pages.
-    for ($i = 0; $i < $page_count; $i++)
+    $title       = get_data_by_field($resource['ref'], $title_field);
+    $access      = $lang["access" . $resource["access"]];
+    $udata       = get_user($resource["created_by"]);
+    $contributor = $udata["fullname"];
+    $metadata    = array($title, $access, $contributor);
+    $rs_dir      = substr($baseurl, strpos($baseurl, "//") + 2);
+    $path_to_pdf = get_resource_path($rid, true, '', false, $resource['file_extension'], -1, 1, false, '', -1, false);
+
+    $page_count  = get_page_count($resource);
+    $url_list    = array(); 
+    $image_sizes = array(); 
+
+    // The built-in general-purpose PHP method getimagesize() is very slow. 
+    // Under the assumption that the BookReader will only deal with jpeg,
+    // we are using getjpegsize() instead to boost up the speed.
+    for ($i = 1; $i < $page_count + 1; $i++)
         {
-        list($width, $height) = getimagesize($url_list[$i]);
+        $url = get_resource_path($rid, false, 'scr', false,  $resource['preview_extension'], -1, $i, false, '', -1, true);
+        array_push($url_list, $url);
+        // list($width, $height) = getimagesize($url);
+        list($width, $height) = getjpegsize($url);
         array_push($image_sizes, array($width, $height));
         }
 
-    // Pass variables along to javascript
-    // Arrays must be encoded first
     $image_sizes = json_encode($image_sizes);
     $url_list    = json_encode($url_list);
 
@@ -67,11 +80,20 @@
     echo "var access = '"      . $metadata[1] . "';\n";
     echo "var contributor = '" . $metadata[2] . "';\n";
     echo "var num_pages = "    . $page_count  . ";\n";
-    echo "var page_sizes = "   . $image_sizes . ";\n";
     echo "var path_to_pdf = '" . $path_to_pdf . "';\n";
+    echo "var page_sizes = "   . $image_sizes . ";\n";
     echo "var url_list = "     . $url_list    . ";\n";
     echo "</script>";
 
+
+    /// Set url attached to the `close` button ///
+
+    if (isset($_SERVER['HTTP_REFERER'])) {
+        $close_url = $_SERVER['HTTP_REFERER'];
+        } 
+        else {
+        $close_url = $baseurl . "/pages/view.php?ref=" . $rid;
+        }
     ?>
 
 </head>
@@ -88,6 +110,8 @@
 	</div>
 
     <script src="../script/bookreader_script.js" type="text/javascript"></script>
+
+    <a id="close-frame" href="<?php echo $close_url;?>" style="font-size:1.1em; color:rgb(70,150,225); top:0.8em; left:0.8em; position:fixed; z-index:999; cursor:pointer; text-decoration: none; font-family: WorkSans, Tahoma, Arial, Helvetica, sans-serif;">✖ close</a>    
 
 </body>
 </html>
