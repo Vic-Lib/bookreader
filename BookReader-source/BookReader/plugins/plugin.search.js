@@ -159,12 +159,13 @@ BookReader.prototype.search = function(term, options) {
       path = this.bookPath.substr(0, this.bookPath.length - subPrefixWithSlash.length);
     }
 
+    // NOTE: this is where the GET request is sent
     var urlParams = {
       'item_id': this.bookId,
-      'doc': this.subPrefix,
-      'path': path,
       'q': term,
     };
+    // 'doc': this.subPrefix,
+    // 'path': path,
 
     var paramStr = $.param(urlParams);
 

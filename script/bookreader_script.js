@@ -95,7 +95,7 @@ var options = {
     /* BookReader's search plugin options */
     server: rs_dir,
     bookId: rid,
-    bookPath: path_to_pdf,
+    bookPath: path_to_pdf, // the full path to pdf
     searchInsideUrl: "/plugins/bookreader/search_inside.php",
 
 };
